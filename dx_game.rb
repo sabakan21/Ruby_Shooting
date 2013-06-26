@@ -14,14 +14,33 @@
 =end
 
 require 'dxruby'
+$stderr=File.open("errlog.txt","w+")
 
-class Bullet <Sprite
+class MyBullet < Sprite
+@@image=Image.new(3, 7, C_WHITE)
+	def initialize(x,y,ang)
+		self.x=x+15
+		self.y=y-15
+		@angle=ang
+		self.angle=@angle
+		self.image=@@image
+	end
 	
+	def update
+		rad=Math::PI*@angle/180.0
+		dy=10*Math::cos(rad)
+		dx=-10*Math::sin(rad)
+		self.y=self.y-dy
+		self.x=self.x-dx
+		if self.y<30
+			self.vanish
+		end
+	end
 end
 
 class Chara < Sprite
 
-	def action
+	def update
 	# move
 		dx = Input.x  # x座標の移動量
 		dy = Input.y  # y座標の移動量
@@ -48,27 +67,41 @@ class Chara < Sprite
 	
 	#shoot
 		if Input.padDown?(P_BUTTON2) then
+			mybullet=MyBullet.new(self.x,self.y,10)
+			$m_bullets.push(mybullet)
+			
+			mybullet=MyBullet.new(self.x,self.y,0)
+			$m_bullets.push(mybullet)
+			
+			mybullet=MyBullet.new(self.x,self.y,-10)
+			$m_bullets.push(mybullet)
 			
 		end
 	end
 
 end
 
-img=Image.loadTiles('shoot.png', 4, 1)
-mychara=Chara.new(0,0,img[0])
-
-dx=0
-dy=0
-
-Window.width=640
-Window.height=480
+$e_bullets=Array.new
+$m_bullets=Array.new
+$objects=[]
 
 bgi=Image.load('bg.png')  #背景の読み込み
+$objects<<Sprite.new(0,0,bgi)
+
+img=Image.loadTiles('shoot.png', 4, 1)
+mychara=Chara.new(304,400,img[0])
+
+$objects<<mychara
+Window.width=640
+Window.height=480
+$objects<<$e_bullets
+$objects<<$m_bullets
 
 
 Window.loop do
-	Window.draw(0,0,bgi,0)
+	
+	Sprite.update($objects)
+	Sprite.clean($objects)
+	Sprite.draw($objects)
 
-	mychara.action
-  mychara.draw
 end
