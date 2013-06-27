@@ -1,1 +1,0 @@
-C:/Users/Akira/Documents/GitHub/Ruby_Shooting/dx_game.rb:98:in `<main>': undefined local variable or method `m_bullets' for main:Object (NameError)
