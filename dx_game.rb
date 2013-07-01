@@ -16,12 +16,14 @@
 require 'dxruby'
 $stderr=File.open("errlog.txt","w+")
 
+
 class MyBullet < Sprite
 @@image=Image.new(3, 7, C_WHITE)
 	def initialize(x,y,ang)
 		self.x=x+15
 		self.y=y-15
 		@angle=ang
+		@outof=0
 		self.angle=@angle
 		self.image=@@image
 	end
@@ -32,9 +34,13 @@ class MyBullet < Sprite
 		dx=-10*Math::sin(rad)
 		self.y=self.y-dy
 		self.x=self.x-dx
-		if self.y<30
-			self.vanish
-		end
+	end
+	
+	def shot
+		@outof=1
+	end
+	def hit
+		@outof=1
 	end
 end
 
@@ -86,7 +92,8 @@ $m_bullets=Array.new
 $objects=[]
 
 bgi=Image.load('bg.png')  #背景の読み込み
-$objects<<Sprite.new(0,0,bgi)
+field=Sprite.new(0,0,bgi)
+
 
 img=Image.loadTiles('shoot.png', 4, 1)
 mychara=Chara.new(304,400,img[0])
@@ -99,7 +106,11 @@ $objects<<$m_bullets
 
 
 Window.loop do
-	
+	field.draw
+	b=field.check($m_bullets)
+	($m_bullets-b).each{|out|
+		out.vanish
+	}
 	Sprite.update($objects)
 	Sprite.clean($objects)
 	Sprite.draw($objects)
